@@ -1,0 +1,24 @@
+{
+    "name": "appzz/exiftool",
+    "description": "ExifTool Wrapper",
+    "type": "library",
+    "keywords": [
+        "exiftool",
+        "wrapper"
+    ],
+    "homepage": "https://github.com/a-pp-zz/exiftool",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CoolSwitcher",
+            "email": "ds@appzz.pw",
+            "role": "lead"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "autoload": {
+        "psr-4": {"AppZz\\CLI\\Wrappers\\": "src/"}
+    }
+}
