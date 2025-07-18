@@ -25,16 +25,56 @@ class ExifTool {
     	return new self ($input);
     }
 
+    /**
+     * Output to JSON
+     * @return ExifTool
+     */
     public function json ()
     {
     	$this->_args[] = '-j';
     	return $this;
     }
 
+    /**
+     * Convert to numbers
+     * @return ExifTool
+     */
     public function numbers ()
     {
     	$this->_args[] = '-n';
     	return $this;
+    }
+
+    /**
+     * Extract embed data
+     * @param  integer $num
+     * @return ExifTool
+     */
+    public function embed ($num = 0)
+    {
+        $this->_args[] = '-ee'.(($num > 0 && $num <= 3) ? $num : '');
+        $this->_args[] = '-G3';
+        return $this;
+    }
+
+    /**
+     * Short Tag Names
+     * @return ExifTool
+     */
+    public function short ()
+    {
+        $this->_args[] = '-s';
+        return $this;
+    }
+
+    /**
+     * Extract Unknown Tags
+     * @return ExifTool
+     */
+    public function unknown ()
+    {
+        $this->_args[] = '-U';
+        return $this;
     }
 
     public function analyze ()
@@ -62,6 +102,37 @@ class ExifTool {
         }
 
         return $this->_result;
+    }
+
+    public function get_date ()
+    {
+        $datefields = [
+            'DateTimeOriginal',
+            'CreateDate-rus',
+            'CreationDate',
+            'CreateDate',
+            'TrackCreateDate',
+            'MediaCreateDate',
+            'ProfileDateTime',
+            'FileModifyDate',
+            'FileAccessDate'
+        ];
+
+        if ( ! empty ($this->_result)) {
+            foreach ($datefields as $df) {
+                $datetime = Arr::get ($this->_result, $df);
+
+                if ( ! empty ($datetime)) {
+                    $date = substr ($datetime, 0, 10);
+                    $time = substr ($datetime, 11, 8);
+                    $date = str_replace (':', '-', $date);
+                    $time = str_replace ('-', ':', $time);
+                    return $date . ' ' . $time;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function _json_decode ($json)
