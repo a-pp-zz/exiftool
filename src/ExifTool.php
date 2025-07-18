@@ -2,7 +2,7 @@
 /**
  * ExifTool Wrapper
  * @package CLI/ExifTool
- * @version	1.0.0
+ * @version	1.0.x
  */
 namespace AppZz\CLI\Wrappers;
 use \AppZz\Helpers\Arr;
@@ -13,11 +13,13 @@ class ExifTool {
 	private $_input;
 	private $_result;
 	private $_args = [];
+    private $_cmd;
 
     public function __construct ($input = null)
     {
         $this->_input = $input;
         $this->_args = [];
+        $this->_cmd = '';
     }
 
     public static function factory ($input = null)
@@ -79,10 +81,8 @@ class ExifTool {
 
     public function analyze ()
     {
-    	$this->json();
-    	$args = array_unique ($this->_args);
-    	$args = implode (' ', $args);
-    	$this->_result = shell_exec (sprintf ('%s %s %s', self::$binary, trim ($args), escapeshellarg($this->_input)));
+        $this->_prepare();
+    	$this->_result = shell_exec ($this->_cmd);
         $this->_result = $this->_json_decode ($this->_result);
 
         if ($this->_result) {
@@ -133,6 +133,24 @@ class ExifTool {
         }
 
         return false;
+    }
+
+    public function __toString ()
+    {
+        $this->_prepare();
+        return $this->_cmd;
+    }
+
+    private function _prepare ()
+    {
+        if (empty($this->_cmd)) {
+            $this->json();
+            $args = array_unique ($this->_args);
+            $args = implode (' ', $args);
+            $this->_cmd = sprintf ('%s %s %s', self::$binary, trim ($args), escapeshellarg($this->_input));
+        }
+
+        return $this;
     }
 
     private function _json_decode ($json)
